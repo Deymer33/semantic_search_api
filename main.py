@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from model import search_tools
 from fastapi.middleware.cors import CORSMiddleware
+from textgen import generar_respuesta
 
 app = FastAPI()
 
@@ -19,4 +20,8 @@ class SearchRequest(BaseModel):
 @app.post("/search")
 def search(request: SearchRequest):
     results = search_tools(request.query)
-    return {"results": results}
+    respuesta = generar_respuesta(request.query, results)
+    return {
+        "message": respuesta,
+        "results": results
+    }

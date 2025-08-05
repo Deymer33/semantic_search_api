@@ -24,6 +24,7 @@ def search_tools(query, top_k=3):
             results.append({
                 "tool": row['description'],
                 "link": row['link'],
+                "name": row['name'],
                 "suggestion": f"Te recomendamos esta herramienta para: {row['description'][:80]}..."
             })
         if len(results) == top_k:
