@@ -1,0 +1,1 @@
+0 3 */2 * * /usr/local/bin/python /app/generate_embeddings.py >> /var/log/cron.log 2>&1

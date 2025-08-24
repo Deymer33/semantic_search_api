@@ -1,10 +1,31 @@
-FROM python:3.10-slim
+FROM python:3.11-slim
+
+ENV PIP_NO_CACHE_DIR=1
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        build-essential cmake libprotobuf-dev protobuf-compiler \
+        cron mariadb-client && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requeriment.txt ./
 
-COPY . .
+RUN pip install --no-cache-dir -r requeriment.txt && \
+    apt-get purge -y build-essential cmake libprotobuf-dev protobuf-compiler && \
+    apt-get autoremove -y && \
+    rm -rf /var/lib/apt/lists/*
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+COPY . /app
+
+RUN mkdir -p /app/data
+
+COPY crontab.txt /etc/cron.d/embeddings-cron
+RUN chmod 0644 /etc/cron.d/embeddings-cron && crontab /etc/cron.d/embeddings-cron
+
+COPY cronjob.sh /cronjob.sh
+RUN chmod +x /cronjob.sh
+
+EXPOSE 8000
+CMD ["/cronjob.sh"]
